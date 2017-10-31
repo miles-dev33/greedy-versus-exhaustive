@@ -70,7 +70,6 @@ public:
 // Alias for a vector of shared pointers to Food objects.
 typedef std::vector<std::shared_ptr<Food>> FoodVector;
 
-
 // Load all the valid foods from a USDA database in their ABBREV
 // format. Foods that are missing fields such as the amount string are
 // skipped. Returns nullptr on I/O error.
@@ -243,16 +242,14 @@ std::unique_ptr<FoodVector> exhaustive_max_protein(const FoodVector& foods,
 	int total_kcal) {
 	const int n = foods.size();
 	assert(n < 64);
-	// TODO: implement this function, then delete this comment
 	int cand_calories, cand_protein, best_calories, best_protein;
 	std::unique_ptr<FoodVector> best (new FoodVector);
 	double power = pow(2, n);
 	for (uint64_t bits = 0; bits < power; bits++) {
 		std::unique_ptr<FoodVector> candidate (new FoodVector);
 		for (int j = 0; j < n; j++) {
-			if (((bits >> j) & 1) == 1) {
+			if (((bits >> j) & 1) == 1)
 				candidate->push_back(foods[j]);
-			}
 		}
 		sum_food_vector(cand_calories, cand_protein, *candidate);
 		sum_food_vector(best_calories, best_protein, *best);
