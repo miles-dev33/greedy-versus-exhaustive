@@ -132,12 +132,14 @@ public:
 	      << earned_points << " / " << total_points
 	      << std::endl
 	      << std::endl;
-
+	system("pause");
     if (all_passed) {
       return 0;
     } else {
       return 1;
     }
+
+	
   }
 
 private:

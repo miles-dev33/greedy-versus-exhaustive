@@ -193,13 +193,17 @@ std::unique_ptr<FoodVector> filter_food_vector(const FoodVector& source,
 	int min_kcal,
 	int max_kcal,
 	int total_size) {
+	//Declaring a pointer to store the new vector in
 	std::unique_ptr<FoodVector> result(new FoodVector);
+	//Loads from source argument, the result vector of the proper food items with
+	// the correct caloric intake specifications 
 	for (auto& food : source) {
 		if (food->kcal() > min_kcal 
 			&& food->kcal() <= max_kcal 
 			&& result->size() != total_size)
 			result->push_back(food);
 	}
+	//Return the filtered food vector
 	return result;
 }
 
@@ -213,18 +217,24 @@ std::unique_ptr<FoodVector> greedy_max_protein(const FoodVector& foods,
 	FoodVector todo = foods;
 	std::unique_ptr<FoodVector> result (new FoodVector);
 	int result_cal = 0, index, counter;
+	//Loops until we have run out of foods
 	while (!todo.empty()) {
 		index = 0;
 		counter = 0;
 		std::shared_ptr<Food> f (new Food(" "," ",0,0,0));
+		//for each food in todo, food will become every 
+		//single object in the vector
 		for (auto& food : todo) {
+			//finds the newest higher protein items 
 			if (food->protein_g() > f->protein_g()) {
 				f = food;
 				index = counter;
 			}
 			counter++;
 		}
+		//End of the range which is the end of the list
 		todo.erase(todo.begin() + index);
+		//keeps track of our calorie budget 
 		if (result_cal + f->kcal() <= total_kcal) {
 			result->push_back(f);
 			result_cal += f->kcal();
@@ -240,22 +250,32 @@ std::unique_ptr<FoodVector> greedy_max_protein(const FoodVector& foods,
 // vector must be less than 64.
 std::unique_ptr<FoodVector> exhaustive_max_protein(const FoodVector& foods,
 	int total_kcal) {
+	//declares the n to the size of the food vector
 	const int n = foods.size();
 	assert(n < 64);
+	//Declares the variables used within the sum food vector function
 	int cand_calories, cand_protein, best_calories, best_protein;
+	//Declares the best food vector unique pointer
 	std::unique_ptr<FoodVector> best (new FoodVector);
+	//Creates power to be 2^n
 	double power = pow(2, n);
+	//Subset generating nested for loop
 	for (uint64_t bits = 0; bits < power; bits++) {
 		std::unique_ptr<FoodVector> candidate (new FoodVector);
 		for (int j = 0; j < n; j++) {
+			//Line that generates subsets
 			if (((bits >> j) & 1) == 1)
+				//pushes all food items worthy of being a candidate
 				candidate->push_back(foods[j]);
 		}
+		//Returns the total calories and protein for the input food vector
 		sum_food_vector(cand_calories, cand_protein, *candidate);
 		sum_food_vector(best_calories, best_protein, *best);
+		//Updates the best vector with the optimal protein items 
 		if (cand_calories <= total_kcal) 
 			if (best->empty() || cand_protein > best_protein)
 				*best = *candidate;
 	}
+	//Return the best subsets of protein items in the food vector for the given caloric bounds 
 	return best;
 }
